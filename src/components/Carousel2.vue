@@ -1,36 +1,40 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
 <template>
   <div class="mx-auto w-full h-full">
-    <div ref="wrapper" class="relative overflow-hidden mt-24"
-         style="padding-bottom: 100%">
+    <div ref="wrapper" class="relative overflow-hidden h-full">
       <ul
           ref="container"
-          :class="`absolute inset-0 flex justify-between items-center ${images.length > slides ? `space-x-${spacing}` : ''}`"
+          class="flex inset-0 justify-around items-stretch w-full h-full"
+          :class="`${spacingString}`"
           :style="{width: `${images.length > slides ? images.length * (100 / slides) : 100}%`}"
           @pointerdown="dragStart"
           @pointerup="dragStop"
           @pointermove="dragMove"
           @mousedown.prevent
       >
-        <li
-            v-for="(img, i) in images"
-            :key="i"
-            class="w-full h-full min-w-1/3"
-            style="touch-action: none"
-            @dragstart.prevent
-        >
-          <img
-              :src="img"
-              class="object-cover object-center w-full h-full"
-              @mousedown.prevent
-          />
-        </li>
+        <slot name="default">
+          <li
+              v-for="(img, i) in images"
+              :key="i"
+              class="w-full h-full min-w-1/3 align-stretch"
+              style="touch-action: none"
+              @dragstart.prevent
+          >
+            <div class="w-full h-full pb-[100%] relative">
+              <img
+                  :src="img"
+                  class="object-cover object-center absolute inset-0 w-full h-full"
+                  @mousedown.prevent
+              />
+            </div>
+          </li>
+        </slot>
       </ul>
       <!--PIGINATION-->
       <div
           class="absolute bottom-0 flex items-center justify-center space-x-6 transform translate-x-1/2 right-1/2"
           @click="changeImage"
-          v-if="showBullets"
+          v-if="showNavigationBullets"
       >
         <button
             v-for="(img, i) in images"
@@ -87,19 +91,11 @@
       </button>
 
     </div>
-    <pre class="">
-        xDown: {{ xDown }}
-        xDiff: {{ xDiff }}
-        xCurrent: {{ currentX }}
-        imageIndex: {{ currentIndex }}
-        slides Per View: {{ slides }}
-        totalImages: {{ images.length }}
-    </pre>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 import useCarousel from '@/composables/useCarousel';
 
 const props = defineProps({
@@ -109,11 +105,23 @@ const props = defineProps({
   },
   slides: {
     type: Number,
-    required: true
+    default: 1
   },
   showNavigationArrows: {
     type: Boolean,
     default: true
+  },
+  spaceX: {
+    type: Number,
+    default: 4
+  },
+  dots: {
+    type: Boolean,
+    default: true
+  },
+  autoplay: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -128,7 +136,7 @@ const {
   spacing,
   // Add your computed properties and methods here
   xDiff,
-  showBullets,
+  showNavigationBullets,
   // Methods
   next,
   prev,
@@ -137,5 +145,11 @@ const {
   dragStop,
   dragMove
 } = useCarousel(props);
+
+const spacingString = computed(() => {
+  const { slides, images } = props;
+  console.log('slides.value', slides, 'images.length', images.length, `space-x-${spacing.value}`)
+  return slides > 1 ? `space-x-${spacing.value}` : '';
+});
 
 </script>

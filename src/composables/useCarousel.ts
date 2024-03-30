@@ -1,7 +1,20 @@
-import { ref, computed, toRefs } from 'vue';
+/**
+ * Developed by Syed Haider Hassan
+ * This is a composable function that can be used to create
+ * a carousel in Vue 3 in combination with Carousel.vue component
+ */
+
+import { ref, computed, toRefs, onMounted, onUnmounted } from 'vue';
 import gsap from 'gsap';
 
-export default function useCarousel (props) {
+export default function useCarousel (props: Prettify<Readonly<{
+  slides: InferPropType<{ default: number; type: NumberConstructor }>;
+  interval: InferPropType<{ default: number; type: NumberConstructor }>;
+  dots: InferPropType<{ default: boolean; type: BooleanConstructor }>;
+  autoplay: InferPropType<{ default: boolean; type: BooleanConstructor }>;
+  spaceX: InferPropType<{ default: number; type: NumberConstructor }>;
+  showNavigationArrows: InferPropType<{ default: boolean; type: BooleanConstructor }>
+} & { images?: InferPropType<{ type: () => string[]; required: boolean }> }>>) {
   // Defining Data Variables
   const currentIndex = ref(0);
   const animationPlaying = ref(false);
@@ -10,9 +23,15 @@ export default function useCarousel (props) {
   const xMove = ref(0);
   const currentX = ref(0);
   const container = ref(null);
-  const spacing = ref(6);
+  const autoplayIntervalId = ref(null);
   const { images, slides } = toRefs(props);
 
+
+
+  const spacing = computed(() => {
+    const space = props.spaceX ?? 4;
+    return props.slides > 1 ? space : 0;
+  });
 
   const xDiff = computed(() => {
     return xDown.value - xMove.value;
@@ -25,8 +44,8 @@ export default function useCarousel (props) {
     return container.value.children[0].clientWidth + spacing.value * 4;
   });
 
-  const showBullets = computed(() => {
-    return slides.value === 1 && images.value.length > slides.value
+  const showNavigationBullets = computed(() => {
+    return props.dots && slides.value === 1 && images.value.length > slides.value
   });
 
   const scrollWidth = computed(() => {
@@ -135,7 +154,7 @@ export default function useCarousel (props) {
     if (!container.value) return false;
     animationPlaying.value = true;
     gsap.to(container.value, {
-      x: -(currentIndex.value * clientWidth.value),
+      x: -(currentIndex.value * slideWidth.value),
       duration: 0.2,
       onComplete: () => {
         animationPlaying.value = false;
@@ -143,6 +162,35 @@ export default function useCarousel (props) {
     });
   };
 
+  const startAutoplay = () => {
+    stopAutoplay(); // Stop existing autoplay to avoid multiple intervals
+    autoplayIntervalId.value = setInterval(() => {
+      console.log('performing autoplay');
+      if (props.images && currentIndex.value < props.images.length - 1) {
+        currentIndex.value++;
+      } else {
+        currentIndex.value = 0; // Reset to first slide when reaching the end
+      }
+      updateSliderPosition();
+    }, props.interval); // Change slide every 3 seconds
+  };
+
+  const stopAutoplay = () => {
+    if (autoplayIntervalId.value) {
+      clearInterval(autoplayIntervalId.value);
+      autoplayIntervalId.value = null;
+    }
+  };
+
+  onMounted((): void => {
+    console.log('props.autoplay', props.autoplay);
+    if (props.autoplay) {
+      startAutoplay();
+    }
+  });
+  onUnmounted(() => {
+    stopAutoplay();
+  });
   return {
     // Return all the reactive variables and methods
     // that your components need
@@ -157,7 +205,7 @@ export default function useCarousel (props) {
     xDiff,
     clientWidth,
     slideWidth,
-    showBullets,
+    showNavigationBullets,
     scrollWidth,
     dragStart,
     dragStop,
