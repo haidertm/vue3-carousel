@@ -11,6 +11,8 @@
           @pointerup="dragStop"
           @pointermove="dragMove"
           @mousedown.prevent
+          @mouseenter="pauseAutoplay"
+          @mouseleave="resumeAutoplay"
       >
         <slot name="default">
           <li
@@ -127,6 +129,10 @@ const props = defineProps({
   interval: {
     type: Number,
     default: 5000
+  },
+  speed: {
+    type: Number,
+    default: 0.3
   }
 });
 
@@ -148,7 +154,9 @@ const {
   changeImage,
   dragStart,
   dragStop,
-  dragMove
+  dragMove,
+  pauseAutoplay,
+  resumeAutoplay
 } = useCarousel(props);
 
 const spacingString = computed(() => {

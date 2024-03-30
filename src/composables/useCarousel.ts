@@ -12,6 +12,7 @@ export default function useCarousel (props: Prettify<Readonly<{
   interval: InferPropType<{ default: number; type: NumberConstructor }>;
   dots: InferPropType<{ default: boolean; type: BooleanConstructor }>;
   autoplay: InferPropType<{ default: boolean; type: BooleanConstructor }>;
+  speed: InferPropType<{ default: boolean; type: BooleanConstructor }>;
   spaceX: InferPropType<{ default: number; type: NumberConstructor }>;
   showNavigationArrows: InferPropType<{ default: boolean; type: BooleanConstructor }>
 } & { images?: InferPropType<{ type: () => string[]; required: boolean }> }>>) {
@@ -25,7 +26,6 @@ export default function useCarousel (props: Prettify<Readonly<{
   const container = ref(null);
   const autoplayIntervalId = ref(null);
   const { images, slides } = toRefs(props);
-
 
 
   const spacing = computed(() => {
@@ -78,7 +78,7 @@ export default function useCarousel (props: Prettify<Readonly<{
     animationPlaying.value = true;
     gsap.to(container.value, {
       x: -(currentIndex.value * slideWidth.value),
-      duration: 0.2,
+      duration: props.speed,
       onComplete: () => {
         animationPlaying.value = false;
         currentX.value = currentIndex.value * slideWidth.value;
@@ -107,7 +107,7 @@ export default function useCarousel (props: Prettify<Readonly<{
       currentIndex.value = +e.target.dataset.index;
       gsap.to(container.value, {
         x: -(currentIndex.value * slideWidth.value),
-        duration: 0.2,
+        duration: props.speed,
         onComplete: () => {
           animationPlaying.value = false;
           currentX.value = currentIndex.value * slideWidth.value;
@@ -126,7 +126,7 @@ export default function useCarousel (props: Prettify<Readonly<{
     animationPlaying.value = true;
     gsap.to(container.value, {
       x: `+= ${-slideWidth.value}`,
-      duration: 0.2,
+      duration: props.speed,
       onComplete: () => {
         currentIndex.value++;
         animationPlaying.value = false;
@@ -141,7 +141,7 @@ export default function useCarousel (props: Prettify<Readonly<{
     animationPlaying.value = true;
     gsap.to(container.value, {
       x: `+= ${slideWidth.value}`,
-      duration: 0.2,
+      duration: props.speed,
       onComplete: () => {
         currentIndex.value--;
         animationPlaying.value = false;
@@ -155,7 +155,7 @@ export default function useCarousel (props: Prettify<Readonly<{
     animationPlaying.value = true;
     gsap.to(container.value, {
       x: -(currentIndex.value * slideWidth.value),
-      duration: 0.2,
+      duration: props.speed,
       onComplete: () => {
         animationPlaying.value = false;
       }
@@ -180,6 +180,12 @@ export default function useCarousel (props: Prettify<Readonly<{
       clearInterval(autoplayIntervalId.value);
       autoplayIntervalId.value = null;
     }
+  };
+  const pauseAutoplay = () => {
+    stopAutoplay();
+  };
+  const resumeAutoplay = () => {
+    startAutoplay();
   };
 
   onMounted((): void => {
@@ -213,6 +219,8 @@ export default function useCarousel (props: Prettify<Readonly<{
     changeImage,
     next,
     prev,
-    updateSliderPosition
+    updateSliderPosition,
+    pauseAutoplay,
+    resumeAutoplay
   };
 }
