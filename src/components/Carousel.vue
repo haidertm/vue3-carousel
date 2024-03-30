@@ -30,21 +30,22 @@
           </li>
         </slot>
       </ul>
-      <!--PIGINATION-->
-      <div
-          class="absolute bottom-0 flex items-center justify-center space-x-6 transform translate-x-1/2 right-1/2"
-          @click="changeImage"
-          v-if="showNavigationBullets"
-      >
-        <button
-            v-for="(img, i) in images"
-            :key="i"
-            class="w-4 h-4 rounded-full"
-            :class="[currentIndex == i ? 'bg-white' : 'bg-black']"
-            :data-index="i"
-        ></button>
-      </div>
-
+      <slot name="dots" :changeImage="changeImage" :currentIndex="currentIndex">
+        <!--PIGINATION-->
+        <div
+            class="absolute bottom-0 flex items-center justify-center space-x-6 transform translate-x-1/2 right-1/2"
+            @click="changeImage"
+            v-if="showNavigationBullets"
+        >
+          <button
+              v-for="(img, i) in images"
+              :key="i"
+              class="w-4 h-4 rounded-full"
+              :class="[currentIndex == i ? 'bg-white' : 'bg-black']"
+              :data-index="i"
+          ></button>
+        </div>
+      </slot>
       <button
           v-if="showNavigationArrows && currentIndex > 0"
           class="absolute transform -translate-y-1/2 top-1/2"

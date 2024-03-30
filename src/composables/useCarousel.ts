@@ -104,13 +104,13 @@ export default function useCarousel (props: Prettify<Readonly<{
   const changeImage = (e) => {
     if (e.target.tagName === 'BUTTON' && animationPlaying.value === false) {
       animationPlaying.value = true;
-      currentIndex.value = e.target.dataset.index;
+      currentIndex.value = +e.target.dataset.index;
       gsap.to(container.value, {
-        x: -(currentIndex.value * clientWidth.value),
+        x: -(currentIndex.value * slideWidth.value),
         duration: 0.2,
         onComplete: () => {
           animationPlaying.value = false;
-          currentX.value = currentIndex.value * clientWidth.value;
+          currentX.value = currentIndex.value * slideWidth.value;
         }
       });
     }
