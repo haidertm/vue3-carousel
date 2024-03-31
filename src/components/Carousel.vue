@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, onMounted } from 'vue';
 import useCarousel from '@/composables/useCarousel';
 
 const props = defineProps({
@@ -135,6 +135,14 @@ const props = defineProps({
     default: 0.3
   }
 });
+
+if (props.images && props.images.length > 0) {
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = props.images[0];
+  document.head.appendChild(link);
+}
 
 const {
   currentIndex,
