@@ -1,57 +1,13 @@
 <template>
   <main>
-    <Carousel
-        :images="images"
-        :show-navigation-arrows="false"
-        :autoplay="false"
-        :interval="5000"
-    >
-      <template v-slot:dots="{changeImage,currentIndex}">
-        <!--PIGINATION-->
-        <div
-            class="absolute bottom-0 flex items-center justify-center space-x-6 transform translate-x-1/2 right-1/2"
-            @click="changeImage"
-        >
-          <button
-              v-for="(img, i) in images"
-              :key="i"
-              class="w-4 h-4 rounded-full mb-5"
-              :class="[currentIndex === i ? 'bg-white' : 'bg-black']"
-              :data-index="i"
-          ></button>
-        </div>
-      </template>
-    </Carousel>
-    <Carousel
-        :images="images"
-        :show-navigation-arrows="true"
-        :slides="6"
-        :space-x="2"
-        class="mt-5"
-    />
+    <Gallery :images="images" />
   </main>
 </template>
 
 <script setup>
 import './assets/app.css'; // Here
-import Carousel from './components/Carousel.vue'
 import { computed } from 'vue';
-
-const imageModules = import.meta.glob('@/assets/images/**/*.webp')
-
-// const getImages = () => {
-//   const context = require.context('./assets/images/465090', false, /\.(png|jpe?g|svg)$/);
-//   return context.keys().map(context);
-// }
-//
-// console.log('images33', getImages());
-
-// const images = computed(() => {
-//   return Object.keys(imageModules)
-//       .map(path =>
-//           location.href + path
-//       );
-// })
+import Gallery from '@/components/Gallery.vue';
 
 const images = computed(() => {
   // return Object.keys(imageModules).map(path => imageModules[path]());
@@ -65,10 +21,6 @@ const images = computed(() => {
     'https://images.pexels.com/photos/270637/pexels-photo-270637.jpeg?auto=compress&cs=tinysrgb&w=600'
   ]
 })
-
-// console.log('images', images)
-// console.log('imagesV2', imagesV2)
-// console.log('imagesV233', Object.keys(imageModules))
 
 </script>
 

@@ -4,20 +4,23 @@
  * a carousel in Vue 3 in combination with Carousel.vue component
  */
 
-import { ref, computed, toRefs, onMounted, onUnmounted } from 'vue';
+import { ref, computed, toRefs, onMounted, onUnmounted, watch } from 'vue';
 import gsap from 'gsap';
 
 export default function useCarousel (props: Prettify<Readonly<{
   slides: InferPropType<{ default: number; type: NumberConstructor }>;
   interval: InferPropType<{ default: number; type: NumberConstructor }>;
+  activeIndex: InferPropType<{ default: number; type: NumberConstructor }>;
   dots: InferPropType<{ default: boolean; type: BooleanConstructor }>;
   autoplay: InferPropType<{ default: boolean; type: BooleanConstructor }>;
   speed: InferPropType<{ default: boolean; type: BooleanConstructor }>;
   spaceX: InferPropType<{ default: number; type: NumberConstructor }>;
   showNavigationArrows: InferPropType<{ default: boolean; type: BooleanConstructor }>
-} & { images?: InferPropType<{ type: () => string[]; required: boolean }> }>>) {
+} & {
+  images?: InferPropType<{ type: () => string[]; required: boolean }>
+}>>, emit: (event: string, ...args: any[]) => void) {
   // Defining Data Variables
-  const currentIndex = ref(0);
+  const currentIndex = ref(props.activeIndex);
   const animationPlaying = ref(false);
   const xDown = ref(null);
   const yDown = ref(null);
@@ -25,7 +28,10 @@ export default function useCarousel (props: Prettify<Readonly<{
   const currentX = ref(0);
   const container = ref(null);
   const autoplayIntervalId = ref(null);
-  const { images, slides } = toRefs(props);
+  const {
+    images, slides
+  }
+    = toRefs(props);
 
 
   const spacing = computed(() => {
@@ -197,6 +203,19 @@ export default function useCarousel (props: Prettify<Readonly<{
   onUnmounted(() => {
     stopAutoplay();
   });
+
+  watch(currentIndex, (updatedValue) => {
+    emit('slideChanged', { updatedValue });
+  });
+
+  watch(
+    () => props.activeIndex,
+    (currentAI) => {
+      currentIndex.value = currentAI;
+      updateSliderPosition();
+    }
+  );
+
   return {
     // Return all the reactive variables and methods
     // that your components need

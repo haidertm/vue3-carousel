@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed, onMounted } from 'vue';
+import { defineProps, defineEmits, computed } from 'vue';
 import useCarousel from '@/composables/useCarousel';
 
 const props = defineProps({
@@ -134,8 +134,13 @@ const props = defineProps({
   speed: {
     type: Number,
     default: 0.3
+  },
+  activeIndex: {
+    type: Number,
+    default: 0
   }
 });
+const emit = defineEmits(['slideChanged']);
 
 
 //Preload the First Image
@@ -168,7 +173,7 @@ const {
   dragMove,
   pauseAutoplay,
   resumeAutoplay
-} = useCarousel(props);
+} = useCarousel(props, emit);
 
 const spacingString = computed(() => {
   const { slides, images } = props;
