@@ -27,6 +27,7 @@
                   :src="img"
                   class="object-cover object-center absolute inset-0 w-full h-full"
                   @mousedown.prevent
+                  :loading="i===0?'eager':'lazy'"
               />
             </div>
           </li>
@@ -136,6 +137,8 @@ const props = defineProps({
   }
 });
 
+
+//Preload the First Image
 if (props.images && props.images.length > 0) {
   const link = document.createElement('link');
   link.rel = 'preload';

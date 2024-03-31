@@ -3,7 +3,7 @@
     <Carousel
         :images="images"
         :show-navigation-arrows="false"
-        :autoplay="true"
+        :autoplay="false"
         :interval="5000"
     >
       <template v-slot:dots="{changeImage,currentIndex}">
